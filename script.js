@@ -1,4 +1,4 @@
-//your JS code here.
+// your JS code here.
 
 // Do not change code below this line
 // This code will just display the questions to the screen
@@ -30,27 +30,73 @@ const questions = [
   },
 ];
 
-// Display the quiz questions and choices
+// ✅ Select DOM elements
+const questionsElement = document.getElementById("questions");
+const submitButton = document.getElementById("submit");
+const scoreDiv = document.getElementById("score");
+
+// ✅ Load saved progress from sessionStorage
+let progress = JSON.parse(sessionStorage.getItem("progress")) || {};
+
+// ✅ Render questions
 function renderQuestions() {
+  questionsElement.innerHTML = ""; // clear before rendering
   for (let i = 0; i < questions.length; i++) {
     const question = questions[i];
     const questionElement = document.createElement("div");
-    const questionText = document.createTextNode(question.question);
+
+    const questionText = document.createElement("p");
+    questionText.textContent = question.question;
     questionElement.appendChild(questionText);
+
     for (let j = 0; j < question.choices.length; j++) {
       const choice = question.choices[j];
       const choiceElement = document.createElement("input");
-      choiceElement.setAttribute("type", "radio");
-      choiceElement.setAttribute("name", `question-${i}`);
-      choiceElement.setAttribute("value", choice);
-      if (userAnswers[i] === choice) {
-        choiceElement.setAttribute("checked", true);
+      choiceElement.type = "radio";
+      choiceElement.name = `question-${i}`;
+      choiceElement.value = choice;
+
+      // ✅ Restore saved choice if exists
+      if (progress[i] === choice) {
+        choiceElement.checked = true;
       }
-      const choiceText = document.createTextNode(choice);
+
+      // ✅ Save progress on selection
+      choiceElement.addEventListener("change", () => {
+        progress[i] = choice;
+        sessionStorage.setItem("progress", JSON.stringify(progress));
+      });
+
+      const choiceLabel = document.createElement("label");
+      choiceLabel.textContent = choice;
+
       questionElement.appendChild(choiceElement);
-      questionElement.appendChild(choiceText);
+      questionElement.appendChild(choiceLabel);
+      questionElement.appendChild(document.createElement("br"));
     }
+
     questionsElement.appendChild(questionElement);
   }
 }
+
+// ✅ Submit button logic
+submitButton.addEventListener("click", () => {
+  let score = 0;
+  for (let i = 0; i < questions.length; i++) {
+    if (progress[i] === questions[i].answer) {
+      score++;
+    }
+  }
+
+  scoreDiv.textContent = `Your score is ${score} out of ${questions.length}.`;
+  localStorage.setItem("score", score);
+});
+
+// ✅ Show score if it exists in localStorage
+const savedScore = localStorage.getItem("score");
+if (savedScore !== null) {
+  scoreDiv.textContent = `Your score is ${savedScore} out of ${questions.length}.`;
+}
+
+// ✅ Render questions on load
 renderQuestions();
