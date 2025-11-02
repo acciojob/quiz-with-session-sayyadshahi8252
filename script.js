@@ -57,9 +57,10 @@ function renderQuestions() {
       choiceElement.value = choice;
 
       // ✅ Restore saved choice if exists
-      if (progress[i] === choice) {
-        choiceElement.checked = true;
-      }
+   if (progress[i] === choice) {
+  choiceElement.checked = true;
+  choiceElement.setAttribute("checked", "true");
+}
 
       // ✅ Save progress on selection
       choiceElement.addEventListener("change", () => {
